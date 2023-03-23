@@ -6,6 +6,10 @@ _pad        = '_'
 _punctuation = ',.!?-~…'
 _letters = 'AEINOQUabdefghijklmnoprstuvwyzʃʧʦɯɹəɥ⁼ʰ`→↓↑ '
 
+# korean_cleaners
+_pad        = '_'
+_punctuation = ',.!?…~'
+_letters = 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㄲㄸㅃㅆㅉㅏㅓㅗㅜㅡㅣㅐㅔ '
 
 
 # Export all symbols:
