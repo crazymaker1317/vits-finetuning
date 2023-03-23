@@ -31,7 +31,6 @@ from losses import (
   discriminator_loss,
   feature_loss,
   kl_loss
-  subband_stft_loss
 )
 from mel_processing import mel_spectrogram_torch, spec_to_mel_torch
 from text.symbols import symbols
