@@ -10,3 +10,5 @@ unidecode
 pyopenjtalk
 protobuf
 tqdm
+jamo
+ko_pron
