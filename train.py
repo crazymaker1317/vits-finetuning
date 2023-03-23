@@ -14,10 +14,6 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 
-import librosa
-import logging
-
-logging.getLogger('numba').setLevel(logging.WARNING)
 
 import commons
 import utils
@@ -35,6 +31,7 @@ from losses import (
   discriminator_loss,
   feature_loss,
   kl_loss
+  subband_stft_loss
 )
 from mel_processing import mel_spectrogram_torch, spec_to_mel_torch
 from text.symbols import symbols
@@ -66,7 +63,7 @@ def run(rank, n_gpus, hps):
     writer = SummaryWriter(log_dir=hps.model_dir)
     writer_eval = SummaryWriter(log_dir=os.path.join(hps.model_dir, "eval"))
 
-  dist.init_process_group(backend='gloo' if os.name == 'nt' else 'nccl', init_method='env://', world_size=n_gpus, rank=rank)
+  dist.init_process_group(backend='nccl', init_method='env://', world_size=n_gpus, rank=rank)
   torch.manual_seed(hps.train.seed)
   torch.cuda.set_device(rank)
 
