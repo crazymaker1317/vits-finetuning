@@ -51,8 +51,7 @@ def main():
   n_gpus = torch.cuda.device_count()
   os.environ['MASTER_ADDR'] = 'localhost'
   os.environ['MASTER_PORT'] = '8000'
-#   n_gpus = 1
-  
+
   hps = utils.get_hparams()
   mp.spawn(run, nprocs=n_gpus, args=(n_gpus, hps,))
 
@@ -66,7 +65,7 @@ def run(rank, n_gpus, hps):
     writer = SummaryWriter(log_dir=hps.model_dir)
     writer_eval = SummaryWriter(log_dir=os.path.join(hps.model_dir, "eval"))
 
-  dist.init_process_group(backend='nccl', init_method='env://', world_size=n_gpus, rank=rank)
+  dist.init_process_group(backend='gloo' if os.name == 'nt' else 'nccl', init_method='env://', world_size=n_gpus, rank=rank)
   torch.manual_seed(hps.train.seed)
   torch.cuda.set_device(rank)
 
@@ -231,12 +230,6 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
         evaluate(hps, net_g, eval_loader, writer_eval)
         utils.save_checkpoint(net_g, optim_g, hps.train.learning_rate, epoch, os.path.join(hps.model_dir, "G_{}.pth".format(global_step)))
         utils.save_checkpoint(net_d, optim_d, hps.train.learning_rate, epoch, os.path.join(hps.model_dir, "D_{}.pth".format(global_step)))
-        old_g=os.path.join(hps.model_dir, "G_{}.pth".format(global_step-2000))
-        old_d=os.path.join(hps.model_dir, "D_{}.pth".format(global_step-2000))
-        if os.path.exists(old_g):
-          os.remove(old_g)
-        if os.path.exists(old_d):
-          os.remove(old_d)
     global_step += 1
   
   if rank == 0:
